@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Star Wars Quotes — AI Showdown</title>
+<meta name="description" content="The same Star Wars quote prompt, given to Claude, ChatGPT, and Grok. One galaxy. Three AIs. You decide.">
+<meta property="og:title" content="Star Wars Quotes — AI Showdown">
+<meta property="og:description" content="Claude vs ChatGPT vs Grok. Same prompt. Same galaxy. Different results.">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Star_Wars_Logo.svg/1200px-Star_Wars_Logo.svg.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Star_Wars_Logo.svg/1200px-Star_Wars_Logo.svg.png">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #FFE81A;
+    --blue: #4FC3F7;
+    --dark: #050A14;
+    --text: #C8D8E8;
+    --claude: #D97757;
+    --claude-glow: rgba(217,119,87,0.4);
+    --chatgpt: #10A37F;
+    --chatgpt-glow: rgba(16,163,127,0.4);
+    --grok: #1D9BF0;
+    --grok-glow: rgba(29,155,240,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Crimson Text', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  #stars {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem 6rem;
+  }
+
+  /* HEADER */
+  .brand {
+    text-align: center;
+    margin-bottom: 4rem;
+    animation: riseIn 0.8s ease 0.2s both;
+  }
+
+  .brand-episode {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.5em;
+    color: var(--gold);
+    opacity: 0.6;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .brand-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 0 40px rgba(255,232,26,0.5), 0 0 80px rgba(255,232,26,0.2);
+    letter-spacing: 0.08em;
+    line-height: 1.1;
+  }
+
+  .gold-line {
+    width: 160px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 1.4rem auto;
+  }
+
+  .brand-subtitle {
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--blue);
+    letter-spacing: 0.25em;
+    opacity: 0.85;
+    margin-bottom: 1.2rem;
+  }
+
+  .challenge-badge {
+    display: inline-block;
+    border: 1px solid rgba(255,232,26,0.25);
+    padding: 0.4rem 1.4rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    opacity: 0.55;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  /* CARDS */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 980px;
+    animation: riseIn 0.8s ease 0.45s both;
+  }
+
+  .card {
+    position: relative;
+    background: linear-gradient(145deg, rgba(13,27,46,0.96), rgba(5,10,20,0.98));
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 2.2rem 2rem 2rem;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+    box-shadow: 0 0 20px var(--accent-glow);
+    transition: height 0.3s ease;
+  }
+
+  .card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 0 26px 26px 0;
+    border-color: transparent var(--accent) transparent transparent;
+    opacity: 0.35;
+  }
+
+  .card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 24px 60px var(--accent-glow);
+  }
+
+  .card:hover::before { height: 4px; }
+
+  .card-claude { --accent: var(--claude); --accent-glow: var(--claude-glow); padding-top: 3rem; }
+  .card-chatgpt { --accent: var(--chatgpt); --accent-glow: var(--chatgpt-glow); }
+  .card-grok    { --accent: var(--grok);    --accent-glow: var(--grok-glow); }
+
+  .crown {
+    position: absolute;
+    top: 0.85rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1rem;
+    animation: float 2.2s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px var(--claude));
+  }
+
+  @keyframes float {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(-5px); }
+  }
+
+  .card-ai-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.4em;
+    color: var(--accent);
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .card-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .card-desc {
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--text);
+    opacity: 0.58;
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .card-cta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-top: 0.4rem;
+    transition: gap 0.3s ease;
+  }
+
+  .card:hover .card-cta { gap: 0.9rem; }
+  .card-cta::after { content: '→'; font-size: 0.9rem; }
+
+  /* PROMPT BOX */
+  .prompt-box {
+    margin-top: 3.5rem;
+    max-width: 680px;
+    width: 100%;
+    text-align: center;
+    animation: riseIn 0.8s ease 0.7s both;
+  }
+
+  .prompt-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    opacity: 0.45;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+
+  .prompt-text {
+    background: rgba(255,232,26,0.03);
+    border: 1px solid rgba(255,232,26,0.1);
+    padding: 1.2rem 1.8rem;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--text);
+    opacity: 0.6;
+    line-height: 1.7;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  /* FOOTER */
+  footer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 10;
+    text-align: center;
+    padding: 1rem;
+    background: linear-gradient(to top, rgba(5,10,20,0.97) 40%, transparent);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.52rem;
+    letter-spacing: 0.45em;
+    color: var(--gold);
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  /* SCANLINES */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px);
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="page">
+
+  <header class="brand">
+    <div class="brand-episode">Same Prompt · Three AIs · One Galaxy</div>
+    <h1 class="brand-title">STAR WARS QUOTES</h1>
+    <div class="gold-line"></div>
+    <p class="brand-subtitle">Words Across the Galaxy — AI Edition</p>
+    <span class="challenge-badge">Choose Your AI &nbsp;↓</span>
+  </header>
+
+  <div class="cards">
+
+    <a class="card card-claude" href="Claude.html">
+      <div class="crown" title="Leading the galaxy">👑</div>
+      <div class="card-ai-label">Anthropic &nbsp;·&nbsp; Currently Leading</div>
+      <div class="card-name">Claude</div>
+      <div class="card-desc">Cinematic atmosphere, twinkling star field, opening crawl, and a lightsaber cursor trail. The Force is strong with this one.</div>
+      <div class="card-cta">Enter the Galaxy</div>
+    </a>
+
+    <a class="card card-grok" href="Grok.html">
+      <div class="card-ai-label">xAI</div>
+      <div class="card-name">Grok</div>
+      <div class="card-desc">From the outer rim of the galaxy. Unorthodox and unpredictable — like a Sith that occasionally answers your questions.</div>
+      <div class="card-cta">View Version</div>
+    </a>
+
+    <a class="card card-chatgpt" href="ChatGPT.html">
+      <div class="card-ai-label">OpenAI</div>
+      <div class="card-name">ChatGPT</div>
+      <div class="card-desc">A solid attempt from the Rebellion's other general. Competent and reliable — but does it hold the high ground?</div>
+      <div class="card-cta">View Version</div>
+    </a>
+  </div>
+
+  <div class="prompt-box">
+    <div class="prompt-label">The Exact Prompt Given to All Three</div>
+    <div class="prompt-text">
+      "Create an HTML page Star Wars themed full of Star Wars quotes in chronological and character order."
+    </div>
+  </div>
+
+</div>
+
+<footer>A long time ago in a galaxy far, far away &nbsp;·&nbsp; Star Wars AI Challenge</footer>
+
+<script>
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function init() {
+    stars = Array.from({ length: 300 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.4 + 0.2,
+      phase: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.4 + 0.05
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const t = Date.now() * 0.001;
+    stars.forEach(s => {
+      const a = 0.3 + 0.7 * Math.abs(Math.sin(s.phase + t * s.speed));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200,216,232,${a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); init(); });
+  resize(); init(); draw();
+</script>
+</body>
+</html>

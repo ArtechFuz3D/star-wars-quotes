@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Star Wars — Words Across the Galaxy</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #FFE81A;
+    --blue: #4FC3F7;
+    --red: #FF3131;
+    --dark: #050A14;
+    --mid: #0D1B2E;
+    --light-text: #C8D8E8;
+    --glow-gold: 0 0 20px rgba(255,232,26,0.6);
+    --glow-blue: 0 0 20px rgba(79,195,247,0.5);
+    --glow-red: 0 0 20px rgba(255,49,49,0.5);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--dark);
+    color: var(--light-text);
+    font-family: 'Crimson Text', Georgia, serif;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* STAR FIELD */
+  #stars-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* OPENING CRAWL INTRO */
+  .crawl-wrapper {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 100;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: fadeOutCrawl 1s ease 7s forwards;
+  }
+
+  .crawl-wrapper.gone { display: none; }
+
+  .crawl-logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(2rem, 8vw, 5rem);
+    font-weight: 900;
+    color: var(--gold);
+    text-shadow: var(--glow-gold);
+    letter-spacing: 0.15em;
+    animation: logoScale 2s ease forwards, fadeOutLogo 1s ease 5.5s forwards;
+  }
+
+  .crawl-sub {
+    font-family: 'Crimson Text', serif;
+    font-style: italic;
+    color: var(--blue);
+    font-size: 1.3rem;
+    letter-spacing: 0.3em;
+    margin-top: 1rem;
+    opacity: 0;
+    animation: fadeIn 1s ease 2s forwards, fadeOutLogo 1s ease 5.5s forwards;
+  }
+
+  @keyframes logoScale {
+    0% { transform: scale(4); opacity: 0; }
+    30% { opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes fadeIn { to { opacity: 1; } }
+  @keyframes fadeOutLogo { to { opacity: 0; } }
+  @keyframes fadeOutCrawl { to { opacity: 0; pointer-events: none; } }
+
+  /* MAIN LAYOUT */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 6rem 2rem 4rem;
+  }
+
+  /* SITE HEADER */
+  .site-header {
+    text-align: center;
+    margin-bottom: 5rem;
+    opacity: 0;
+    animation: riseIn 1s ease 7.5s forwards;
+  }
+
+  .site-header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.8rem, 5vw, 3.5rem);
+    font-weight: 900;
+    color: var(--gold);
+    text-shadow: var(--glow-gold);
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+  }
+
+  .site-header p {
+    color: var(--blue);
+    font-style: italic;
+    font-size: 1.2rem;
+    margin-top: 0.8rem;
+    letter-spacing: 0.2em;
+  }
+
+  .header-line {
+    width: 200px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 1.5rem auto;
+  }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* EPISODE / FILM SECTIONS */
+  .episode {
+    margin-bottom: 5rem;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .episode.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .episode-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,232,26,0.2);
+  }
+
+  .episode-number {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    opacity: 0.8;
+  }
+
+  .episode-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1rem, 3vw, 1.6rem);
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+  }
+
+  .episode-year {
+    font-family: 'Crimson Text', serif;
+    font-style: italic;
+    color: var(--light-text);
+    opacity: 0.5;
+    font-size: 1rem;
+    margin-left: auto;
+  }
+
+  /* QUOTE CARDS */
+  .quotes-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .quote-card {
+    background: linear-gradient(135deg, rgba(13,27,46,0.9) 0%, rgba(5,10,20,0.95) 100%);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-left: 3px solid var(--accent, var(--gold));
+    padding: 1.5rem 2rem;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  }
+
+  .quote-card:hover {
+    transform: translateX(6px);
+    box-shadow: -4px 0 20px var(--accent-glow, rgba(255,232,26,0.3));
+    border-left-color: var(--accent, var(--gold));
+  }
+
+  .quote-card blockquote {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    font-style: italic;
+    line-height: 1.7;
+    color: #E8EDF2;
+    margin-bottom: 0.8rem;
+  }
+
+  .quote-card blockquote::before {
+    content: '\201C';
+    font-size: 3rem;
+    color: var(--accent, var(--gold));
+    opacity: 0.3;
+    line-height: 0;
+    vertical-align: -0.4em;
+    margin-right: 0.1em;
+    font-style: normal;
+  }
+
+  .quote-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .character-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent, var(--gold));
+    box-shadow: 0 0 8px var(--accent, var(--gold));
+    flex-shrink: 0;
+  }
+
+  .character-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--accent, var(--gold));
+    text-transform: uppercase;
+  }
+
+  .quote-context {
+    font-size: 0.85rem;
+    color: var(--light-text);
+    opacity: 0.45;
+    font-style: italic;
+    margin-left: auto;
+  }
+
+  /* CHARACTER ACCENT COLORS */
+  .char-yoda { --accent: #7CFC00; --accent-glow: rgba(124,252,0,0.3); }
+  .char-obi  { --accent: #4FC3F7; --accent-glow: rgba(79,195,247,0.3); }
+  .char-qui  { --accent: #4FC3F7; --accent-glow: rgba(79,195,247,0.3); }
+  .char-anakin { --accent: #FF8C00; --accent-glow: rgba(255,140,0,0.3); }
+  .char-padme { --accent: #FFB7C5; --accent-glow: rgba(255,183,197,0.3); }
+  .char-vader { --accent: #FF3131; --accent-glow: rgba(255,49,49,0.3); }
+  .char-palpatine { --accent: #9C27B0; --accent-glow: rgba(156,33,176,0.3); }
+  .char-luke { --accent: #FFE81A; --accent-glow: rgba(255,232,26,0.3); }
+  .char-leia { --accent: #F0F0F0; --accent-glow: rgba(240,240,240,0.2); }
+  .char-han  { --accent: #CD853F; --accent-glow: rgba(205,133,63,0.3); }
+  .char-rey  { --accent: #66BB6A; --accent-glow: rgba(102,187,106,0.3); }
+  .char-kylo { --accent: #EF5350; --accent-glow: rgba(239,83,80,0.3); }
+  .char-mando { --accent: #90A4AE; --accent-glow: rgba(144,164,174,0.3); }
+
+  /* SEPARATOR */
+  .force-divider {
+    text-align: center;
+    margin: 4rem 0;
+    opacity: 0.4;
+  }
+
+  .force-divider span {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.5em;
+    color: var(--gold);
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    border-top: 1px solid rgba(255,232,26,0.1);
+    color: rgba(200,216,232,0.3);
+    font-style: italic;
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  footer .footer-logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    color: var(--gold);
+    opacity: 0.5;
+    letter-spacing: 0.3em;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  /* LIGHTSABER CURSOR TRAIL - subtle glow dots */
+  .trail-dot {
+    position: fixed;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.8;
+    transition: opacity 0.5s;
+  }
+</style>
+</head>
+<body>
+
+<!-- OPENING CRAWL -->
+<div class="crawl-wrapper" id="crawl">
+  <div class="crawl-logo">STAR WARS</div>
+  <div class="crawl-sub">Words Across the Galaxy</div>
+</div>
+
+<canvas id="stars-canvas"></canvas>
+
+<main>
+  <header class="site-header">
+    <h1>WORDS ACROSS THE GALAXY</h1>
+    <div class="header-line"></div>
+    <p>Iconic Quotes — Chronological & By Character</p>
+  </header>
+
+  <!-- EPISODE I -->
+  <section class="episode" data-episode>
+    <div class="episode-header">
+      <span class="episode-number">Episode I</span>
+      <h2 class="episode-title">The Phantom Menace</h2>
+      <span class="episode-year">32 BBY · 1999</span>
+    </div>
+    <div class="quotes-grid">
+
+      <div class="quote-card char-qui">
+        <blockquote>There's always a bigger fish.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Qui-Gon Jinn</span>
+          <span class="quote-context">to Jar Jar, after the sea monster</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-qui">
+        <blockquote>Your focus determines your reality.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Qui-Gon Jinn</span>
+          <span class="quote-context">to young Anakin</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-obi">
+        <blockquote>I have a bad feeling about this.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Obi-Wan Kenobi</span>
+          <span class="quote-context">aboard the Trade Federation ship</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-yoda">
+        <blockquote>Fear is the path to the dark side. Fear leads to anger, anger leads to hate, hate leads to suffering.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Yoda</span>
+          <span class="quote-context">Jedi Council chamber</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-anakin">
+        <blockquote>Are you an angel? I've heard the deep space pilots talk about them. They're the most beautiful creatures in the universe.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Anakin Skywalker</span>
+          <span class="quote-context">to Padmé, first meeting on Tatooine</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-qui">
+        <blockquote>The ability to speak does not make you intelligent.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Qui-Gon Jinn</span>
+          <span class="quote-context">to Jar Jar Binks</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="force-divider"><span>✦ ✦ ✦</span></div>
+
+  <!-- EPISODE II -->
+  <section class="episode" data-episode>
+    <div class="episode-header">
+      <span class="episode-number">Episode II</span>
+      <h2 class="episode-title">Attack of the Clones</h2>
+      <span class="episode-year">22 BBY · 2002</span>
+    </div>
+    <div class="quotes-grid">
+
+      <div class="quote-card char-obi">
+        <blockquote>Why do I get the feeling you're going to be the death of me?</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Obi-Wan Kenobi</span>
+          <span class="quote-context">to Anakin, Coruscant chase</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-anakin">
+        <blockquote>I don't like sand. It's coarse and rough and irritating and it gets everywhere.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Anakin Skywalker</span>
+          <span class="quote-context">to Padmé on Naboo</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-padme">
+        <blockquote>We live in a real world, come back to it.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Padmé Amidala</span>
+          <span class="quote-context">to Anakin during debate</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-yoda">
+        <blockquote>Truly wonderful, the mind of a child is.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Yoda</span>
+          <span class="quote-context">after a Jedi youngling solves the mystery</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-obi">
+        <blockquote>Qui-Gon's defiance I sense in you. Need that, you do not.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Yoda</span>
+          <span class="quote-context">to Obi-Wan at the Jedi Temple</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="force-divider"><span>✦ ✦ ✦</span></div>
+
+  <!-- EPISODE III -->
+  <section class="episode" data-episode>
+    <div class="episode-header">
+      <span class="episode-number">Episode III</span>
+      <h2 class="episode-title">Revenge of the Sith</h2>
+      <span class="episode-year">19 BBY · 2005</span>
+    </div>
+    <div class="quotes-grid">
+
+      <div class="quote-card char-palpatine">
+        <blockquote>Did you ever hear the tragedy of Darth Plagueis the Wise? I thought not. It's not a story the Jedi would tell you.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Chancellor Palpatine</span>
+          <span class="quote-context">to Anakin at the opera</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-anakin">
+        <blockquote>From my point of view, the Jedi are evil!</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Anakin Skywalker</span>
+          <span class="quote-context">to Obi-Wan on Mustafar</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-obi">
+        <blockquote>You were the chosen one! It was said that you would destroy the Sith, not join them!</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Obi-Wan Kenobi</span>
+          <span class="quote-context">on the shores of Mustafar</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-obi">
+        <blockquote>I have the high ground.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Obi-Wan Kenobi</span>
+          <span class="quote-context">Mustafar duel, final moment</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-yoda">
+        <blockquote>Into exile I must go. Failed, I have.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Yoda</span>
+          <span class="quote-context">after Senate battle with Palpatine</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="force-divider"><span>✦ ✦ ✦</span></div>
+
+  <!-- EPISODE IV -->
+  <section class="episode" data-episode>
+    <div class="episode-header">
+      <span class="episode-number">Episode IV</span>
+      <h2 class="episode-title">A New Hope</h2>
+      <span class="episode-year">0 BBY · 1977</span>
+    </div>
+    <div class="quotes-grid">
+
+      <div class="quote-card char-leia">
+        <blockquote>Help me, Obi-Wan Kenobi. You're my only hope.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Princess Leia</span>
+          <span class="quote-context">holographic message to Obi-Wan</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-obi">
+        <blockquote>The Force is what gives a Jedi his power. It's an energy field created by all living things. It surrounds us and penetrates us; it binds the galaxy together.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Obi-Wan Kenobi</span>
+          <span class="quote-context">to Luke on Tatooine</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-han">
+        <blockquote>Hokey religions and ancient weapons are no match for a good blaster at your side, kid.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Han Solo</span>
+          <span class="quote-context">to Luke aboard the Millennium Falcon</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-vader">
+        <blockquote>I find your lack of faith disturbing.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Darth Vader</span>
+          <span class="quote-context">in the Imperial conference room</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-obi">
+        <blockquote>If you strike me down, I shall become more powerful than you can possibly imagine.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Obi-Wan Kenobi</span>
+          <span class="quote-context">final duel with Vader</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-luke">
+        <blockquote>Use the Force, Luke.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Obi-Wan Kenobi (voice)</span>
+          <span class="quote-context">Death Star trench run</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-han">
+        <blockquote>Never tell me the odds.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Han Solo</span>
+          <span class="quote-context">to C-3PO in the asteroid field</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="force-divider"><span>✦ ✦ ✦</span></div>
+
+  <!-- EPISODE V -->
+  <section class="episode" data-episode>
+    <div class="episode-header">
+      <span class="episode-number">Episode V</span>
+      <h2 class="episode-title">The Empire Strikes Back</h2>
+      <span class="episode-year">3 ABY · 1980</span>
+    </div>
+    <div class="quotes-grid">
+
+      <div class="quote-card char-yoda">
+        <blockquote>Size matters not. Look at me. Judge me by my size, do you?</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Yoda</span>
+          <span class="quote-context">to Luke on Dagobah</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-yoda">
+        <blockquote>Do. Or do not. There is no try.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Yoda</span>
+          <span class="quote-context">to Luke, raising the X-wing</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-leia">
+        <blockquote>I love you.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Princess Leia</span>
+          <span class="quote-context">to Han before the carbon freeze</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-han">
+        <blockquote>I know.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Han Solo</span>
+          <span class="quote-context">before being frozen in carbonite</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-vader">
+        <blockquote>No. I am your father.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Darth Vader</span>
+          <span class="quote-context">Cloud City, to Luke Skywalker</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-yoda">
+        <blockquote>Luminous beings are we, not this crude matter.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Yoda</span>
+          <span class="quote-context">to Luke during Force training</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="force-divider"><span>✦ ✦ ✦</span></div>
+
+  <!-- EPISODE VI -->
+  <section class="episode" data-episode>
+    <div class="episode-header">
+      <span class="episode-number">Episode VI</span>
+      <h2 class="episode-title">Return of the Jedi</h2>
+      <span class="episode-year">4 ABY · 1983</span>
+    </div>
+    <div class="quotes-grid">
+
+      <div class="quote-card char-yoda">
+        <blockquote>When gone am I, the last of the Jedi will you be. The Force runs strong in your family. Pass on what you have learned.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Yoda</span>
+          <span class="quote-context">on Dagobah, final words</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-vader">
+        <blockquote>Luke, you can destroy the Emperor. He has foreseen this. It is your destiny. Join me, and together we can rule the galaxy as father and son.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Darth Vader</span>
+          <span class="quote-context">on Endor shuttle, to Luke</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-palpatine">
+        <blockquote>Your feeble skills are no match for the power of the dark side!</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Emperor Palpatine</span>
+          <span class="quote-context">Death Star II, throne room</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-luke">
+        <blockquote>I am a Jedi, like my father before me.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Luke Skywalker</span>
+          <span class="quote-context">to the Emperor, refusing the dark side</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-vader">
+        <blockquote>Tell your sister... you were right.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Anakin Skywalker</span>
+          <span class="quote-context">final words, dying as himself</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="force-divider"><span>✦ ✦ ✦</span></div>
+
+  <!-- EPISODE VII -->
+  <section class="episode" data-episode>
+    <div class="episode-header">
+      <span class="episode-number">Episode VII</span>
+      <h2 class="episode-title">The Force Awakens</h2>
+      <span class="episode-year">34 ABY · 2015</span>
+    </div>
+    <div class="quotes-grid">
+
+      <div class="quote-card char-han">
+        <blockquote>It's true. All of it. The dark side, the Jedi... they're real.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Han Solo</span>
+          <span class="quote-context">to Rey and Finn aboard the Falcon</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-kylo">
+        <blockquote>I feel it again. The pull to the light.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Kylo Ren</span>
+          <span class="quote-context">to Snoke, conflicted</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-han">
+        <blockquote>That's not how the Force works!</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Han Solo</span>
+          <span class="quote-context">to Finn, Starkiller Base</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-rey">
+        <blockquote>I didn't know there was this much green in the whole galaxy.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Rey</span>
+          <span class="quote-context">arriving on Takodana</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="force-divider"><span>✦ ✦ ✦</span></div>
+
+  <!-- EPISODE VIII -->
+  <section class="episode" data-episode>
+    <div class="episode-header">
+      <span class="episode-number">Episode VIII</span>
+      <h2 class="episode-title">The Last Jedi</h2>
+      <span class="episode-year">34 ABY · 2017</span>
+    </div>
+    <div class="quotes-grid">
+
+      <div class="quote-card char-luke">
+        <blockquote>No one's ever really gone.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Luke Skywalker</span>
+          <span class="quote-context">to Leia, before his sacrifice</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-kylo">
+        <blockquote>Let the past die. Kill it, if you have to. That's the only way to become what you were meant to be.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Kylo Ren</span>
+          <span class="quote-context">to Rey via Force bond</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-yoda">
+        <blockquote>The greatest teacher, failure is.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Yoda</span>
+          <span class="quote-context">Force ghost, to Luke on Ach-To</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-luke">
+        <blockquote>I will not be the last Jedi.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Luke Skywalker</span>
+          <span class="quote-context">to Rey on Ach-To</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-luke">
+        <blockquote>I only know one truth. It's time for the Jedi to end.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Luke Skywalker</span>
+          <span class="quote-context">to Rey, Ach-To cliff</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="force-divider"><span>✦ ✦ ✦</span></div>
+
+  <!-- EPISODE IX -->
+  <section class="episode" data-episode>
+    <div class="episode-header">
+      <span class="episode-number">Episode IX</span>
+      <h2 class="episode-title">The Rise of Skywalker</h2>
+      <span class="episode-year">35 ABY · 2019</span>
+    </div>
+    <div class="quotes-grid">
+
+      <div class="quote-card char-palpatine">
+        <blockquote>The dead speak! The galaxy has heard a mysterious broadcast — a threat of REVENGE in the sinister voice of the late Emperor Palpatine.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Emperor Palpatine</span>
+          <span class="quote-context">opening broadcast, returned from death</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-rey">
+        <blockquote>People keep telling me they know me. No one does.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Rey</span>
+          <span class="quote-context">to Kylo Ren</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-luke">
+        <blockquote>A Jedi's weapon deserves more respect.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Luke Skywalker</span>
+          <span class="quote-context">Force ghost, to Rey on Ach-To</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-rey">
+        <blockquote>I am Rey. Rey Skywalker.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Rey</span>
+          <span class="quote-context">on Tatooine, ending scene</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="force-divider"><span>✦ ✦ ✦</span></div>
+
+  <!-- THE MANDALORIAN -->
+  <section class="episode" data-episode>
+    <div class="episode-header">
+      <span class="episode-number">The Mandalorian</span>
+      <h2 class="episode-title">This Is the Way</h2>
+      <span class="episode-year">9 ABY · 2019–</span>
+    </div>
+    <div class="quotes-grid">
+
+      <div class="quote-card char-mando">
+        <blockquote>This is the Way.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Din Djarin</span>
+          <span class="quote-context">Mandalorian creed, recurring</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-mando">
+        <blockquote>I'm a Mandalorian. Weapons are part of my religion.</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Din Djarin</span>
+          <span class="quote-context">to the New Republic marshal</span>
+        </div>
+      </div>
+
+      <div class="quote-card char-luke">
+        <blockquote>If I am to train you, you must be willing to give memory of him up. Can you do that?</blockquote>
+        <div class="quote-meta">
+          <div class="character-dot"></div>
+          <span class="character-name">Luke Skywalker</span>
+          <span class="quote-context">to Grogu, season 2 finale</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span class="footer-logo">STAR WARS</span>
+  A long time ago in a galaxy far, far away....
+</footer>
+
+<script>
+  // STAR FIELD CANVAS
+  const canvas = document.getElementById('stars-canvas');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function initStars() {
+    stars = [];
+    for (let i = 0; i < 300; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.5 + 0.2,
+        alpha: Math.random(),
+        speed: Math.random() * 0.3 + 0.05,
+        twinkle: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  function drawStars(t) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      s.twinkle += s.speed * 0.03;
+      const a = 0.4 + 0.6 * Math.abs(Math.sin(s.twinkle));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200, 216, 232, ${a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+
+  window.addEventListener('resize', () => { resize(); initStars(); });
+  resize();
+  initStars();
+  drawStars();
+
+  // HIDE CRAWL AFTER ANIMATION
+  setTimeout(() => {
+    document.getElementById('crawl').classList.add('gone');
+  }, 8000);
+
+  // SCROLL REVEAL
+  const episodes = document.querySelectorAll('[data-episode]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  episodes.forEach(ep => observer.observe(ep));
+
+  // LIGHTSABER TRAIL
+  const trail = [];
+  document.addEventListener('mousemove', e => {
+    const dot = document.createElement('div');
+    dot.className = 'trail-dot';
+    dot.style.left = e.clientX - 2 + 'px';
+    dot.style.top = e.clientY - 2 + 'px';
+    const colors = ['#FFE81A','#4FC3F7','#FF3131','#7CFC00'];
+    dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+    document.body.appendChild(dot);
+    trail.push(dot);
+    setTimeout(() => {
+      dot.style.opacity = '0';
+      setTimeout(() => dot.remove(), 500);
+    }, 50);
+    if (trail.length > 20) trail.shift();
+  });
+</script>
+</body>
+</html>
