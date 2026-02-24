@@ -3,13 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>Star Wars Quotes — AI Showdown</title>
-<meta name="description" content="The same Star Wars quote prompt, given to Claude, ChatGPT, and Grok. One galaxy. Three AIs. You decide.">
+<meta name="description" content="The same Star Wars quote prompt given to Claude, ChatGPT, and Grok. One galaxy. Three AIs. You decide.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#050A14">
+
+<!-- Favicon: inline SVG — zero external dependency, works in all modern browsers -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23050A14'/><text y='72' x='50' text-anchor='middle' font-size='72'>⭐</text></svg>">
+<!-- Apple touch icon for iOS home screen bookmarks -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%23050A14'/><text y='130' x='90' text-anchor='middle' font-size='110'>⭐</text></svg>">
+
+<!-- Open Graph (Facebook, LinkedIn, WhatsApp, Discord, Slack) -->
+<!-- Using Unsplash CDN: real JPEG, stable URL, free to use, correct 1200×630 aspect ratio -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Star Wars Quotes — AI Showdown">
 <meta property="og:title" content="Star Wars Quotes — AI Showdown">
-<meta property="og:description" content="Claude vs ChatGPT vs Grok. Same prompt. Same galaxy. Different results.">
-<meta property="og:image" content="Star_Wars_Logo.svg.png">
+<meta property="og:description" content="Claude vs ChatGPT vs Grok. Same prompt. Same galaxy. Three wildly different results.">
+<meta property="og:image" content="https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?w=1200&h=630&fit=crop&q=80">
+<meta property="og:image:secure_url" content="https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?w=1200&h=630&fit=crop&q=80">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Deep space starfield — Star Wars Quotes AI Showdown">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter / X Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="Star_Wars_Logo.svg.png">
+<meta name="twitter:title" content="Star Wars Quotes — AI Showdown">
+<meta name="twitter:description" content="Claude vs ChatGPT vs Grok. Same prompt. Same galaxy. Three wildly different results.">
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?w=1200&h=630&fit=crop&q=80">
+<meta name="twitter:image:alt" content="Deep space starfield — Star Wars Quotes AI Showdown">
+
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -308,6 +333,13 @@
       <div class="card-cta">Enter the Galaxy</div>
     </a>
 
+    <a class="card card-chatgpt" href="ChatGPT.html">
+      <div class="card-ai-label">OpenAI</div>
+      <div class="card-name">ChatGPT</div>
+      <div class="card-desc">A solid attempt from the Rebellion's other general. Competent and reliable — but does it hold the high ground?</div>
+      <div class="card-cta">View Version</div>
+    </a>
+
     <a class="card card-grok" href="Grok.html">
       <div class="card-ai-label">xAI</div>
       <div class="card-name">Grok</div>
@@ -315,12 +347,6 @@
       <div class="card-cta">View Version</div>
     </a>
 
-    <a class="card card-chatgpt" href="ChatGPT.html">
-      <div class="card-ai-label">OpenAI</div>
-      <div class="card-name">ChatGPT</div>
-      <div class="card-desc">A solid attempt from the Rebellion's other general. Competent and reliable — but does it hold the high ground?</div>
-      <div class="card-cta">View Version</div>
-    </a>
   </div>
 
   <div class="prompt-box">
